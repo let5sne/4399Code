@@ -56,19 +56,47 @@ npm run dev
 
 ## 🌐 部署
 
-### Cloudflare Pages
+### Cloudflare Workers (Static Assets)
 
 1. 推送代码到 GitHub
-2. 登录 [Cloudflare Pages](https://dash.cloudflare.com/)
-3. 创建新项目，配置：
+2. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+3. **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**
+4. 选择仓库并配置：
    - **Framework**: Vite
    - **Build command**: `npm run build`
-   - **Build output**: `dist`
+   - **Build output directory**: `dist`
    - **Root directory**: `vite-app`
+5. 部署完成后，前端将通过 CDN 全球分发
 
 ### Supabase Edge Functions
 
 Edge Functions 已在项目中配置，使用 Supabase MCP 工具部署。
+
+## 🔒 安全特性
+
+### 管理后台保护
+
+管理后台 (`/admin.html`) 采用多层安全防护：
+
+1. **数据库层（RLS）**
+   - `coupon_templates` 和 `coupon_pool` 表启用了行级安全策略
+   - 只有 `admin_users` 表中的授权用户可以执行管理操作
+   - 即使绕过前端，数据库也会拒绝未授权的修改
+
+2. **身份认证**
+   - 基于 Supabase Auth 的邮箱验证
+   - Magic Link 无密码登录
+
+3. **应用层保护（可选）**
+   - 可配置 Cloudflare Access 对 `/admin.html` 路径进行访问控制
+   - 在请求到达页面前即进行身份验证
+
+### 添加管理员
+
+在 Supabase SQL Editor 中执行：
+```sql
+INSERT INTO admin_users (email) VALUES ('admin@example.com');
+```
 
 ## 📁 项目结构
 
@@ -82,8 +110,7 @@ Edge Functions 已在项目中配置，使用 Supabase MCP 工具部署。
 │   │   └── supabase.js   # Supabase 客户端
 │   ├── index.html        # 用户端页面
 │   ├── admin.html        # 管理端页面
-│   └── public/
-│       └── _redirects    # Cloudflare Pages API 代理配置
+│   └── wrangler.jsonc    # Cloudflare Workers 配置
 └── supabase/
     ├── functions/        # Edge Functions
     │   └── site/
