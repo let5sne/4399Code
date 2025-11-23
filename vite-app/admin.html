@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4399Code 优惠券管理后台</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .admin-tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .admin-tab.active {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--text-primary);
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .template-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .template-card h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .template-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-color);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .validity-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        .import-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            background: #e6f4ea;
+            color: #1e8e3e;
+        }
+
+        .import-result.error {
+            background: #fce8e6;
+            color: #d93025;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>4399Code 优惠券管理后台</h1>
+            <p style="color: var(--text-secondary)">管理优惠券模板和券码库存</p>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="templates">券种管理</button>
+            <button class="admin-tab" data-tab="stats">统计报表</button>
+        </div>
+
+        <div id="templates-tab" class="tab-content active">
+            <button class="btn btn-primary" id="createTemplateBtn">+ 创建新券种</button>
+            <div id="templatesList" class="template-grid" style="margin-top: 2rem;">
+                <!-- 动态加载 -->
+            </div>
+        </div>
+
+        <div id="stats-tab" class="tab-content">
+            <h2>统计报表</h2>
+            <p style="color: var(--text-secondary)">开发中...</p>
+        </div>
+    </div>
+
+    <!-- 券种模态框 (创建/编辑) -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">创建新券种</h2>
+                <span class="close-modal" onclick="closeModal('templateModal')">&times;</span>
+            </div>
+            <form id="templateForm">
+                <input type="hidden" name="id">
+                <div class="form-group">
+                    <label>券种名称</label>
+                    <input type="text" name="name" required placeholder="例如：4399code上新(日卡)">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" name="description" placeholder="例如：日卡7折优惠券">
+                </div>
+                <div class="form-group">
+                    <label>折扣类型</label>
+                    <select name="discount_type" required>
+                        <option value="percentage">百分比折扣</option>
+                        <option value="fixed">固定金额</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>折扣值</label>
+                    <input type="number" name="discount_value" required step="0.1" placeholder="例如：7 (表示7折)">
+                </div>
+                <div class="form-group">
+                    <label>原价 (¥)</label>
+                    <input type="number" name="original_price" step="0.1" placeholder="例如：120">
+                </div>
+                <div class="form-group">
+                    <label>额度 ($)</label>
+                    <input type="number" name="credit_amount" step="1" placeholder="例如：100">
+                </div>
+                <div class="form-group">
+                    <label>跳转链接 (可选)</label>
+                    <input type="url" name="redirect_url" placeholder="例如：https://example.com/redeem">
+                </div>
+                <div class="form-group">
+                    <label>排序权重 (越小越靠前)</label>
+                    <input type="number" name="sort_order" step="1" value="0" placeholder="默认：0">
+                </div>
+                <div class="form-group">
+                    <label>有效期开始</label>
+                    <input type="datetime-local" name="valid_from" required>
+                </div>
+                <div class="form-group">
+                    <label>有效期结束</label>
+                    <input type="datetime-local" name="valid_until" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal('templateModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 导入券码模态框 -->
+    <div id="importCodesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>批量导入券码</h2>
+                <span class="close-modal" onclick="closeModal('importCodesModal')">&times;</span>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label>券种</label>
+                    <select id="importTemplateSelect" required>
+                        <!-- 动态加载 -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>券码（每行一个）</label>
+                    <textarea id="codesInput"
+                        placeholder="CLAUDE-DAILY-ABC123&#10;CLAUDE-DAILY-DEF456&#10;CLAUDE-DAILY-GHI789"></textarea>
+                </div>
+                <div id="importResult" style="display: none;"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal('importCodesModal')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="importCodes()">导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/admin.js"></script>
+</body>
+
+</html>

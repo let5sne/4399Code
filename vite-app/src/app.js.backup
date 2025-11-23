@@ -1,0 +1,270 @@
+import { supabase } from './supabase.js';
+
+// 加载券种
+async function loadCoupons() {
+    try {
+        const { data: templates, error } = await supabase
+            .from('coupon_templates')
+            .select('*')
+            .eq('status', 'active')
+            .gte('valid_until', new Date().toISOString())
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // 获取每个券种的剩余数量
+        const templatesWithRemaining = await Promise.all(templates.map(async (template) => {
+            const { count: totalCount } = await supabase
+                .from('coupon_pool')
+                .select('*', { count: 'exact', head: true })
+                .eq('template_id', template.id);
+
+            const { count: availableCount } = await supabase
+                .from('coupon_pool')
+                .select('*', { count: 'exact', head: true })
+                .eq('template_id', template.id)
+                .eq('status', 'available');
+
+            return {
+                ...template,
+                total: totalCount || 0,
+                remaining: availableCount || 0
+            };
+        }));
+
+        renderCoupons(templatesWithRemaining);
+    } catch (error) {
+        console.error('加载券种失败:', error);
+        document.getElementById('couponsContainer').innerHTML =
+            '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">加载失败，请刷新重试</p>';
+    }
+}
+
+// 渲染券种卡片
+function renderCoupons(templates) {
+    const container = document.getElementById('couponsContainer');
+
+    if (templates.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">暂无可用优惠券</p>';
+        return;
+    }
+
+    container.innerHTML = templates.map(template => {
+        const formatDate = (date) => new Date(date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        const discountText = template.discount_type === 'percentage' ?
+            `${template.discount_value}折` :
+            `¥${template.discount_value}`;
+
+        return `
+            <div class="price-card">
+                <div class="card-header">
+                    <h3 class="product-name">${template.name}</h3>
+                    <div class="discount-badge">${discountText}</div>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0.5rem 0;">
+                        ${template.description || ''}
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.75rem;">
+                        有效期：${formatDate(template.valid_from)} - ${formatDate(template.valid_until)}
+                    </p>
+                    <p style="color: ${template.remaining > 0 ? '#16a34a' : '#dc2626'}; font-size: 0.875rem; margin-top: 0.5rem;">
+                        剩余: ${template.remaining}/${template.total}
+                    </p>
+                </div>
+                <button class="btn-claim" 
+                        data-template-id="${template.id}"
+                        data-template-name="${template.name}"
+                        ${template.remaining === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                    ${template.remaining === 0 ? '已抢光' : '领取优惠券'}
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // 绑定点击事件
+    attachClaimHandlers();
+}
+
+try {
+    // supabase is now imported directly
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 加载券种
+        await loadCoupons();
+
+        // Check User Session
+        if (supabase) {
+            const { data: { session } } = await supabase.auth.getSession();
+            updateAuthUI(session);
+
+            supabase.auth.onAuthStateChange((_event, session) => {
+                updateAuthUI(session);
+            });
+        }
+
+        // UI Elements
+        const couponModal = document.getElementById('couponModal');
+        const loginModal = document.getElementById('loginModal');
+        const closeCouponModal = document.querySelector('#couponModal .close-modal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const copyBtn = document.getElementById('copyCodeBtn');
+        const navLoginBtn = document.getElementById('navLoginBtn');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Modal Close Events
+        closeCouponModal.addEventListener('click', () => couponModal.classList.remove('show'));
+        closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+
+        window.addEventListener('click', (e) => {
+            if (e.target === couponModal) couponModal.classList.remove('show');
+            if (e.target === loginModal) loginModal.classList.remove('show');
+        });
+
+        // Login Flow
+        navLoginBtn.addEventListener('click', () => {
+            loginModal.classList.add('show');
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const message = document.getElementById('loginMessage');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '发送中...';
+
+            try {
+                const { error } = await supabase.auth.signInWithOtp({ email });
+                if (error) throw error;
+
+                message.textContent = '登录链接已发送到您的邮箱，请查收！';
+                message.classList.remove('hidden', 'text-red-500');
+                message.classList.add('text-green-600');
+            } catch (error) {
+                message.textContent = '发送失败: ' + error.message;
+                message.classList.remove('hidden', 'text-green-600');
+                message.classList.add('text-red-500');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '发送登录链接';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+        });
+
+        // Copy Code
+        copyBtn.addEventListener('click', () => {
+            const code = document.getElementById('couponCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+    });
+});
+
+// 绑定领取按钮事件
+function attachClaimHandlers() {
+    const claimButtons = document.querySelectorAll('.btn-claim');
+    claimButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const templateId = button.dataset.templateId;
+            const templateName = button.dataset.templateName;
+
+            if (!templateId) return;
+
+            // 检查登录状态
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                document.getElementById('loginModal').classList.add('show');
+                return;
+            }
+
+            handleClaim(templateId, templateName, session.access_token);
+        });
+    });
+}
+    });
+
+function updateAuthUI(session) {
+    const navLoginBtn = document.getElementById('navLoginBtn');
+    const userMenu = document.getElementById('userMenu');
+    const userEmail = document.getElementById('userEmail');
+
+    if (session) {
+        navLoginBtn.classList.add('hidden');
+        userMenu.classList.remove('hidden');
+        userMenu.classList.add('flex', 'items-center'); // Ensure flex display
+        userEmail.textContent = session.user.email;
+    } else {
+        navLoginBtn.classList.remove('hidden');
+        userMenu.classList.add('hidden');
+        userMenu.classList.remove('flex');
+        userEmail.textContent = '';
+    }
+}
+
+async function handleClaim(templateId, templateName, token) {
+    showToast(`正在为您领取 ${templateName} 优惠券...`);
+
+    try {
+        const response = await fetch('/api/claim-coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ template_id: templateId }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showCouponModal(data.code, targetUrl);
+        } else {
+            showToast('领取失败: ' + (data.error || '未知错误'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('网络错误，请稍后重试');
+    }
+}
+
+function showCouponModal(code, url) {
+    const modal = document.getElementById('couponModal');
+    document.getElementById('couponCode').textContent = code;
+    document.getElementById('useCouponBtn').href = "https://fe.dtyuedan.cn/shop/GOD6NLTH";
+    modal.classList.add('show');
+}
+
+function showToast(message) {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+    toast.offsetHeight; // Trigger reflow
+    toast.classList.add('show');
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+} catch (e) {
+    console.error("Failed to initialize app:", e);
+}

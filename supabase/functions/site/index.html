@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4399Code - 智能编程助手</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">4399Code</div>
+            <div class="nav-links flex items-center">
+                <a href="#products" class="mr-6">产品优惠</a>
+                <a href="#faq" class="mr-6">常见问题</a>
+                <div id="userMenu" class="hidden">
+                    <span id="userEmail" class="text-sm text-gray-600 mr-4"></span>
+                    <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700">退出</button>
+                </div>
+                <button id="navLoginBtn"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">
+                    登录
+                </button>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1 class="display-text">构建未来的<br>智能编程体验</h1>
+            <p class="subtitle">4399Code 致力于为开发者提供最先进的 AI 辅助工具。新品上市，限时特惠，让每一次编码都充满灵感。</p>
+            <a href="#products" class="btn-primary">查看优惠方案</a>
+        </section>
+
+        <section id="products">
+            <h2 class="section-title">新品上市优惠</h2>
+            <div class="pricing-grid">
+                <!-- 日卡 -->
+                <div class="price-card">
+                    <div class="card-header">
+                        <h3 class="product-name">ClaudeCode 日卡</h3>
+                        <div class="discount-badge">33% OFF</div>
+                        <div class="price-container">
+                            <span class="current-price">¥8</span>
+                            <span class="original-price">¥12</span>
+                        </div>
+                        <div class="save-badge">立省 ¥4</div>
+                    </div>
+                    <ul class="features-list">
+                        <li>包含 $10 额度</li>
+                        <li>适合短期体验</li>
+                        <li>全功能访问</li>
+                    </ul>
+                    <a href="https://example.com/coupon-daily" class="btn-claim">领取优惠券</a>
+                </div>
+
+                <!-- 周卡 -->
+                <div class="price-card">
+                    <div class="card-header">
+                        <h3 class="product-name">ClaudeCode 周卡</h3>
+                        <div class="discount-badge">30% OFF</div>
+                        <div class="price-container">
+                            <span class="current-price">¥84</span>
+                            <span class="original-price">¥120</span>
+                        </div>
+                        <div class="save-badge">立省 ¥36</div>
+                    </div>
+                    <ul class="features-list">
+                        <li>包含 $100 额度</li>
+                        <li>一周畅享编码</li>
+                        <li>优先技术支持</li>
+                    </ul>
+                    <a href="https://example.com/coupon-weekly" class="btn-claim">领取优惠券</a>
+                </div>
+
+                <!-- 月卡 -->
+                <div class="price-card featured">
+                    <div class="card-header">
+                        <h3 class="product-name">ClaudeCode 月卡</h3>
+                        <div class="discount-badge">25% OFF</div>
+                        <div class="price-container">
+                            <span class="current-price">¥120</span>
+                            <span class="original-price">¥160</span>
+                        </div>
+                        <div class="save-badge">立省 ¥40</div>
+                    </div>
+                    <ul class="features-list">
+                        <li>包含 $200 额度</li>
+                        <li>最受欢迎的选择</li>
+                        <li>适合日常开发</li>
+                    </ul>
+                    <a href="https://example.com/coupon-monthly" class="btn-claim">领取优惠券</a>
+                </div>
+
+                <!-- 月卡(M) -->
+                <div class="price-card">
+                    <div class="card-header">
+                        <h3 class="product-name">ClaudeCode 月卡(M)</h3>
+                        <div class="discount-badge">30% OFF</div>
+                        <div class="price-container">
+                            <span class="current-price">¥252</span>
+                            <span class="original-price">¥360</span>
+                        </div>
+                        <div class="save-badge">立省 ¥108</div>
+                    </div>
+                    <ul class="features-list">
+                        <li>包含 $300 额度</li>
+                        <li>高强度开发首选</li>
+                        <li>专属客服通道</li>
+                    </ul>
+                    <a href="https://example.com/coupon-monthly-m" class="btn-claim">领取优惠券</a>
+                </div>
+
+                <!-- 月卡(L) -->
+                <div class="price-card">
+                    <div class="card-header">
+                        <h3 class="product-name">ClaudeCode 月卡(L)</h3>
+                        <div class="discount-badge">30% OFF</div>
+                        <div class="price-container">
+                            <span class="current-price">¥420</span>
+                            <span class="original-price">¥600</span>
+                        </div>
+                        <div class="save-badge">立省 ¥180</div>
+                    </div>
+                    <ul class="features-list">
+                        <li>包含 $500 额度</li>
+                        <li>企业级开发需求</li>
+                        <li>最高优先级支持</li>
+                    </ul>
+                    <a href="https://example.com/coupon-monthly-l" class="btn-claim">领取优惠券</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2 class="section-title">常见问题</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>优惠券有效期是多久？</h3>
+                    <p>新品首发特惠活动持续3个月，领取的优惠券请在活动期间内使用，建议领取后尽快兑换。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何使用优惠券？</h3>
+                    <p>点击"领取优惠券"后，系统会自动为您跳转到支付页面并自动填入优惠码，您只需确认金额即可。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coupon Modal -->
+        <div id="couponModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">领取成功！</h3>
+                    <p class="text-gray-600 mb-6">您的专属优惠码已生成</p>
+
+                    <div class="bg-gray-100 p-4 rounded-lg mb-6 flex justify-between items-center">
+                        <code id="couponCode" class="text-xl font-mono font-bold text-indigo-600">LOADING...</code>
+                        <button id="copyCodeBtn" class="text-gray-500 hover:text-indigo-600 transition">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <a id="useCouponBtn" href="#" target="_blank"
+                        class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition block font-semibold">
+                        立即使用
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" id="closeLoginModal">&times;</span>
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">登录 / 注册</h3>
+                    <p class="text-gray-600 mb-6">请输入您的邮箱以继续领取优惠券</p>
+
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <input type="email" id="emailInput" placeholder="your@email.com" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition">
+                        </div>
+                        <button type="submit" id="loginBtn"
+                            class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                            发送登录链接
+                        </button>
+                    </form>
+                    <p id="loginMessage" class="mt-4 text-sm text-gray-600 hidden"></p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 4399Code. All rights reserved.</p>
+        </footer>
+    </div>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

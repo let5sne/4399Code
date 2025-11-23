@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4399Code - 智能编程助手</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">4399Code</div>
+      <div class="nav-links flex items-center">
+        <a href="#products" class="mr-6">产品优惠</a>
+        <a href="#faq" class="mr-6">常见问题</a>
+        <div id="userMenu" class="hidden">
+          <span id="userEmail" class="text-sm text-secondary mr-4"></span>
+          <button id="logoutBtn" class="btn-logout">退出</button>
+        </div>
+        <button id="navLoginBtn" class="btn-login">登录</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1 class="display-text">构建未来的<br>智能编程体验</h1>
+      <p class="subtitle">4399Code 致力于为开发者提供最先进的 AI 辅助工具。新品上市，限时特惠，让每一次编码都充满灵感。</p>
+      <a href="#products" class="btn-primary">查看优惠方案</a>
+    </section>
+
+    <section id="products">
+      <h2 class="section-title">新品上市优惠</h2>
+      <div class="pricing-grid" id="couponsContainer">
+        <!-- 动态加载券种 -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2 class="section-title">常见问题</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>优惠券有效期是多久？</h3>
+          <p>新品首发特惠活动持续3个月，领取的优惠券请在活动期间内使用，建议领取后尽快兑换。</p>
+        </div>
+        <div class="faq-item">
+          <h3>如何使用优惠券？</h3>
+          <p>点击"领取优惠券"后，系统会自动为您跳转到支付页面并自动填入优惠码，您只需确认金额即可。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coupon Modal -->
+    <div id="couponModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="text-center">
+          <div
+            style="width: 64px; height: 64px; background-color: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+            <i class="fas fa-check" style="color: var(--success-color); font-size: 1.5rem;">✓</i>
+          </div>
+          <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">领取成功！</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">您的专属优惠码已生成</p>
+
+          <div
+            style="background-color: var(--bg-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <code id="couponCode"
+              style="font-family: monospace; font-size: 1.25rem; font-weight: 700; color: var(--primary-color);">LOADING...</code>
+            <button id="copyCodeBtn" style="color: var(--text-secondary); transition: color 0.2s;">
+              <i class="fas fa-copy">复制</i>
+            </button>
+          </div>
+
+          <a id="useCouponBtn" href="#" target="_blank" class="btn-primary w-full">
+            立即使用
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" id="closeLoginModal">&times;</span>
+        <div class="text-center">
+          <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">登录 / 注册</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">请输入您的邮箱以继续领取优惠券</p>
+
+          <form id="loginForm" class="flex flex-col gap-4">
+            <div>
+              <input type="email" id="emailInput" placeholder="your@email.com" required class="input-field">
+            </div>
+            <button type="submit" id="loginBtn" class="btn-primary w-full">
+              发送登录链接
+            </button>
+          </form>
+          <p id="loginMessage" class="mt-4 text-sm hidden"></p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 4399Code. All rights reserved.</p>
+    </footer>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
