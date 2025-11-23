@@ -162,7 +162,7 @@ async function handleClaim(templateId, templateName, token, redirectUrl) {
     showToast(`正在为您领取 ${templateName}...`, 'info');
 
     try {
-        const response = await fetch('/api/claim-coupon', {
+        const response = await fetch('https://usmgskzqvjypqvgydaad.supabase.co/functions/v1/site/api/claim-coupon', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
